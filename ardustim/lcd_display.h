@@ -2,7 +2,7 @@
 /*
  * I2C LCD Display Implementation
  * 
- * Concrete implementation of DisplayInterface for 20x4 I2C LCD
+ * Concrete implementation of DisplayInterface for 16x2 I2C LCD
  * Provides error handling and graceful degradation
  *
  * Part of Ardu-Stim LCD Interface Enhancement
@@ -17,8 +17,8 @@
  * I2C LCD Display Configuration
  */
 #define LCD_I2C_ADDRESS 0x3F   // Try 0x3F if 0x27 doesn't work
-#define LCD_COLUMNS 20         // 20x4 LCD display
-#define LCD_ROWS 4
+#define LCD_COLUMNS 16          // 16x2 LCD display
+#define LCD_ROWS 2
 
 /**
  * Concrete implementation of DisplayInterface for I2C LCD
@@ -54,8 +54,8 @@ public:
     
     /**
      * Set cursor position with bounds checking
-     * @param col Column (0-19 for 20x4 LCD)
-     * @param row Row (0-3 for 20x4 LCD)
+     * @param col Column (0-15 for 16x2 LCD)
+     * @param row Row (0-1 for 16x2 LCD)
      */
     void setCursor(uint8_t col, uint8_t row) override;
     

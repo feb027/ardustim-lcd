@@ -54,7 +54,7 @@ void LCDDisplay::setCursor(uint8_t col, uint8_t row) {
         return;
     }
     
-    // Bounds checking for 20x4 LCD
+    // Bounds checking for 16x2 LCD
     if (col >= LCD_COLUMNS) col = LCD_COLUMNS - 1;
     if (row >= LCD_ROWS) row = LCD_ROWS - 1;
     

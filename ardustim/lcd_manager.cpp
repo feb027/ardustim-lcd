@@ -119,43 +119,26 @@ void LCDManager::updateMainDisplay() {
     
     display->clear();
     
-    // Line 1: Wheel pattern name - now can use full 20 characters
-    char buffer[21]; // Increased buffer size for 20x4 display
-    
-    // Get wheel name and truncate to fit full 20 characters
-    getWheelName(config.wheel, buffer, sizeof(buffer));
+    // Line 1: Wheel pattern name (no "Pola:" prefix)
+    char buffer[17];
     display->setCursor(0, 0);
+    
+    // Get wheel name and truncate to fit full 16 characters
+    getWheelName(config.wheel, buffer, sizeof(buffer));
     display->print(buffer);
     
-    // Line 2: Wheel number and additional wheel info
+    // Line 2: RPM and Mode
     display->setCursor(0, 1);
-    
-    // Show wheel number and degrees (360 or 720)
-    uint16_t wheelDegrees = Wheels[config.wheel].wheel_degrees;
-    snprintf(buffer, sizeof(buffer), "Pattern #%d (%d\xDF)", config.wheel + 1, wheelDegrees);
-    display->print(buffer);
-    
-    // Line 3: RPM with more space and additional info
-    display->setCursor(0, 2);
-    display->print("RPM: ");
+    display->print("RPM:");
     
     // Format and display RPM (full numbers, no "k" suffix)
     formatRPM(currentStatus.rpm, buffer, sizeof(buffer));
-    display->setCursor(5, 2);  // After "RPM: "
+    display->setCursor(4, 1);  // After "RPM:"
     display->print(buffer);
     
-    // Add RPM scaling factor on same line
-    float rpmScaler = Wheels[config.wheel].rpm_scaler;
-    snprintf(buffer, sizeof(buffer), " (x%.2f)", rpmScaler);
-    display->print(buffer);
-    
-    // Line 4: Mode with more descriptive text
-    display->setCursor(0, 3);
-    display->print("Mode: ");
-    
-    // Display mode with more descriptive text
+    // Display mode
     formatMode(config.mode, buffer, sizeof(buffer));
-    display->setCursor(6, 3);  // Position for mode
+    display->setCursor(12, 1);  // Position for mode
     display->print(buffer);
 }
 
@@ -166,17 +149,12 @@ void LCDManager::updateMessageDisplay() {
     
     display->clear();
     
-    // Center the message on line 2 (middle of 4 lines)
+    // Center the message on line 1
     uint8_t messageLen = strlen(messageBuffer);
-    uint8_t startPos = (20 - messageLen) / 2;
+    uint8_t startPos = (16 - messageLen) / 2;
     
-    // Display message on line 2 (centered)
-    display->setCursor(startPos, 1);
+    display->setCursor(startPos, 0);
     display->print(messageBuffer);
-    
-    // Add ArduStim branding on line 4
-    display->setCursor(3, 3);
-    display->print("ArduStim v2.0");
 }
 
 void LCDManager::formatRPM(uint16_t rpm, char* buffer, uint8_t bufferSize) {
@@ -187,16 +165,16 @@ void LCDManager::formatRPM(uint16_t rpm, char* buffer, uint8_t bufferSize) {
 void LCDManager::formatMode(uint8_t mode, char* buffer, uint8_t bufferSize) {
     switch (mode) {
         case FIXED_RPM:
-            strncpy(buffer, "Fixed RPM", bufferSize - 1);
+            strncpy(buffer, "FIX", bufferSize - 1);
             break;
         case POT_RPM:
-            strncpy(buffer, "Potentiometer", bufferSize - 1);
+            strncpy(buffer, "POT", bufferSize - 1);
             break;
         case LINEAR_SWEPT_RPM:
-            strncpy(buffer, "Sweep", bufferSize - 1);
+            strncpy(buffer, "SWP", bufferSize - 1);
             break;
         default:
-            strncpy(buffer, "Unknown", bufferSize - 1);
+            strncpy(buffer, "?", bufferSize - 1);
             break;
     }
     buffer[bufferSize - 1] = '\0';
@@ -209,10 +187,8 @@ void LCDManager::getWheelName(uint8_t wheelIndex, char* buffer, uint8_t bufferSi
         return;
     }
     
-    // Get short wheel name from PROGMEM
-    char* wheelNamePtr = (char*)pgm_read_word(&short_wheel_names[wheelIndex]);
-    strncpy_P(buffer, wheelNamePtr, bufferSize - 1);
-    buffer[bufferSize - 1] = '\0';
+    // Simple approach - just show wheel number for now to avoid PROGMEM issues
+    snprintf(buffer, bufferSize, "Wheel %d", wheelIndex + 1);
 }
 
 

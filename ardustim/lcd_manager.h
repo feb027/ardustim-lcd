@@ -13,7 +13,6 @@
 #include <stdint.h>
 #include <avr/pgmspace.h>
 #include "display_interface.h"
-#include "wheel_names.h"
 
 /**
  * Display Mode Enumeration
@@ -52,7 +51,7 @@ private:
     uint8_t lastMode;
     
     // Message buffer for temporary displays
-    char messageBuffer[21];  // 20 chars + null terminator for 20x4 LCD
+    char messageBuffer[17];  // 16 chars + null terminator for LCD
     
     /**
      * Update main display screen
