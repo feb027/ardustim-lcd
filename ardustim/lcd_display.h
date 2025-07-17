@@ -17,8 +17,8 @@
  * I2C LCD Display Configuration
  */
 #define LCD_I2C_ADDRESS 0x3F   // Try 0x3F if 0x27 doesn't work
-#define LCD_COLUMNS 16          // 16x2 LCD display
-#define LCD_ROWS 2
+#define LCD_COLUMNS 20          // 20x4 LCD display
+#define LCD_ROWS 4
 
 /**
  * Concrete implementation of DisplayInterface for I2C LCD

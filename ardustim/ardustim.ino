@@ -72,6 +72,14 @@ uint8_t sweep_direction = ASCENDING;
 /* Less sensitive globals */
 uint8_t bitshift = 0;
 
+#if ENABLE_LCD_INTERFACE
+/* Startup sequence variables */
+bool startupSequenceActive = false;
+uint8_t startupSequenceState = 0;
+uint32_t startupSequenceTimer = 0;
+uint8_t loadingDots = 0;  // For animated loading dots
+#endif
+
 
 
 
@@ -90,55 +98,46 @@ wheels Wheels[MAX_WHEELS] = {
   { six_minus_one_with_cam_friendly_name, six_minus_one_with_cam, 0.15, 36, 720 },
   { twelve_minus_one_with_cam_friendly_name, twelve_minus_one_with_cam, 0.6, 144, 720 },
   { fourty_minus_one_friendly_name, fourty_minus_one, 0.66667, 80, 360 },
-  { dizzy_four_trigger_return_friendly_name, dizzy_four_trigger_return, 0.15, 9, 720 },
-  { oddfire_vr_friendly_name, oddfire_vr, 0.2, 24, 360 },
+  { dizzy_four_trigger_return_friendly_name, dizzy_four_trigger_return, 0.03333, 4, 360 },
+  { oddfire_vr_friendly_name, oddfire_vr, 0.03333, 4, 360 },
   { optispark_lt1_friendly_name, optispark_lt1, 3.0, 720, 720 },
-  { twelve_minus_three_friendly_name, twelve_minus_three, 0.4, 48, 360 },
+  { twelve_minus_three_friendly_name, twelve_minus_three, 0.15, 18, 360 },
   { thirty_six_minus_two_two_two_friendly_name, thirty_six_minus_two_two_two, 0.6, 72, 360 },
   { thirty_six_minus_two_two_two_h6_friendly_name, thirty_six_minus_two_two_two_h6, 0.6, 72, 360 },
   { thirty_six_minus_two_two_two_with_cam_friendly_name, thirty_six_minus_two_two_two_with_cam, 0.6, 144, 720 },
-  { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.6, 72, 360 },
+  { fourty_two_hundred_wheel_friendly_name, fourty_two_hundred_wheel, 0.66667, 80, 360 },
   { thirty_six_minus_one_with_cam_fe3_friendly_name, thirty_six_minus_one_with_cam_fe3, 0.6, 144, 720 },
-  { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 0.6, 144, 720 },
-  { buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.33333, 80, 720 },
+  { six_g_seventy_two_with_cam_friendly_name, six_g_seventy_two_with_cam, 1.0, 240, 720 },
+  { buell_oddfire_cam_friendly_name, buell_oddfire_cam, 0.03333, 4, 360 },
   { gm_ls1_crank_and_cam_friendly_name, gm_ls1_crank_and_cam, 6.0, 720, 720 },
   { gm_ls_58X_crank_and_4x_cam_friendly_name, GM_LS_58X_crank_and_4x_cam, 1.0, 240, 720},
-  { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 72, 360 },
-  { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.2, 48, 720 },
+  { lotus_thirty_six_minus_one_one_one_one_friendly_name, lotus_thirty_six_minus_one_one_one_one, 0.6, 144, 720 },
+  { honda_rc51_with_cam_friendly_name, honda_rc51_with_cam, 0.6, 144, 720 },
   { thirty_six_minus_one_with_second_trigger_friendly_name, thirty_six_minus_one_with_second_trigger, 0.6, 144, 720 },
-  { chrysler_ngc_thirty_six_plus_two_minus_two_with_ngc4_cam_friendly_name, chrysler_ngc_thirty_six_plus_two_minus_two_with_ngc4_cam, 3.0, 720, 720 },
-  { chrysler_ngc_thirty_six_minus_two_plus_two_with_ngc6_cam_friendly_name, chrysler_ngc_thirty_six_minus_two_plus_two_with_ngc6_cam, 3.0, 720, 720 },
-  { chrysler_ngc_thirty_six_minus_two_plus_two_with_ngc8_cam_friendly_name, chrysler_ngc_thirty_six_minus_two_plus_two_with_ngc8_cam, 3.0, 720, 720 },
-  { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 1.2, 144, 720 },
-  { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 3.0, 720, 720 },
+  { weber_iaw_with_cam_friendly_name, weber_iaw_with_cam, 0.6, 144, 720 },
+  { fiat_one_point_eight_sixteen_valve_with_cam_friendly_name, fiat_one_point_eight_sixteen_valve_with_cam, 0.6, 144, 720 },
   { three_sixty_nissan_cas_friendly_name, three_sixty_nissan_cas, 3.0, 720, 720 },
-  { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.3, 72, 720 },
-  { yamaha_eight_tooth_with_cam_friendly_name, yamaha_eight_tooth_with_cam, 0.26667, 64, 720 },
-  { gm_four_tooth_with_cam_friendly_name, gm_four_tooth_with_cam, 0.06666, 8, 720 },
-  { gm_six_tooth_with_cam_friendly_name, gm_six_tooth_with_cam, 0.1, 12, 720 },
-  { gm_eight_tooth_with_cam_friendly_name, gm_eight_tooth_with_cam, 0.13333, 16, 720 },
-  { volvo_d12acd_with_cam_friendly_name, volvo_d12acd_with_cam, 4.0, 480, 720 },
-  { mazda_thirty_six_minus_two_two_two_with_six_tooth_cam_friendly_name, mazda_thirty_six_minus_two_two_two_with_six_tooth_cam, 1.5, 360, 720 },
+  { twenty_four_minus_two_with_second_trigger_friendly_name, twenty_four_minus_two_with_second_trigger, 0.5, 120, 720 },
+  { yamaha_eight_tooth_with_cam_friendly_name, yamaha_eight_tooth_with_cam, 0.13333, 32, 720 },
   { mitsubishi_4g63_4_2_friendly_name, mitsubishi_4g63_4_2, 0.6, 144, 720 },
-  { audi_135_with_cam_friendly_name, audi_135_with_cam, 1.5, 1080, 720 },
+  { audi_135_with_cam_friendly_name, audi_135_with_cam, 2.25, 540, 720 },
   { honda_d17_no_cam_friendly_name, honda_d17_no_cam, 0.6, 144, 720 },
-  { mazda_323_au_friendly_name, mazda_323_au, 1, 30, 720 },
-  { daihatsu_3cyl_friendly_name, daihatsu_3cyl, 0.8, 144, 360 },
+  { daihatsu_3cyl_friendly_name, daihatsu_3cyl, 0.03333, 4, 360 },
   { miata_9905_friendly_name, miata_9905, 0.6, 144, 720 },
-  { twelve_with_cam_friendly_name, twelve_with_cam, 0.6, 144, 720 },
-  { twenty_four_with_cam_friendly_name, twenty_four_with_cam, 0.6, 144, 720 },
+  { twelve_with_cam_friendly_name, twelve_with_cam, 0.2, 48, 720 },
+  { twenty_four_with_cam_friendly_name, twenty_four_with_cam, 0.4, 96, 720 },
   { subaru_six_seven_name_friendly_name, subaru_six_seven, 3.0, 720, 720 },
   { gm_seven_x_friendly_name, gm_seven_x, 1.502, 180, 720 },
   { four_twenty_a_friendly_name, four_twenty_a, 0.6, 144, 720 },
   { ford_st170_friendly_name, ford_st170, 3.0, 720, 720 },
-  { mitsubishi_3A92_friendly_name, mitsubishi_3A92, 0.6, 144, 720 },
+  { mitsubishi_3A92_friendly_name, mitsubishi_3A92, 0.05, 12, 720 },
   { Toyota_4AGE_CAS_friendly_name, toyota_4AGE_CAS, 0.333, 144, 720 },
-  { Toyota_4AGZE_friendly_name, toyota_4AGZE, 0.333, 144, 720 },
-  { Suzuki_DRZ400_friendly_name, suzuki_DRZ400,0.6, 72, 360},
-  { Jeep_2000_friendly_name, jeep_2000, 1.5, 360, 720},
-  { BMW_N20_friendly_name, bmw_n20, 1.0, 240, 720},
+  { Toyota_4AGZE_friendly_name, toyota_4AGZE, 0.4, 96, 720 },
+  { Suzuki_DRZ400_friendly_name, suzuki_DRZ400, 0.6, 72, 360},
+  { Jeep_2000_4cyl_friendly_name, jeep_2000_4cyl, 1.5, 360, 720},
   { VIPER9602_friendly_name, viper9602wheel, 1.0, 240, 720},
   { thirty_six_minus_two_with_second_trigger_friendly_name, thirty_six_minus_two_with_second_trigger, 0.6, 144, 720 },
+  { GM_40_Tooth_Trans_OSS_friendly_name, GM40toothOSS, 0.66667, 80, 360 },
 };
 
 /* Initialization */
@@ -245,12 +244,16 @@ void setup() {
     lcdManager.init(&lcdDisplay);
     uiController.init(&buttonManager, &lcdManager);
     
-    // Show startup message
-    lcdManager.showMessage(PSTR("ARDU-STIM v2"), 2000);
+    // Start non-blocking startup sequence
+    lcdManager.enterStartupMode();
+    startupSequenceState = 0;
+    startupSequenceTimer = millis();
+    startupSequenceActive = true;
   } else {
     // LCD initialization failed - system continues with serial interface only
     // Log error to serial (will be available after serialSetup())
     // Note: Serial output will show this after setup() completes
+    startupSequenceActive = false;
   }
 #endif
   // Set ADSC in ADCSRA (0x7A) to start the ADC conversion
@@ -320,6 +323,211 @@ ISR(TIMER1_COMPA_vect)
   OCR1A = new_OCR1A;  /* Apply new "RPM" from Timer2 ISR, i.e. speed up/down the virtual "wheel" */
 }
 
+#if ENABLE_LCD_INTERFACE
+/**
+ * Handle non-blocking startup sequence with impressive visual effects
+ */
+void handleStartupSequence() {
+  if (!startupSequenceActive) return;
+  
+  uint32_t currentTime = millis();
+  uint32_t elapsed = currentTime - startupSequenceTimer;
+  
+  switch (startupSequenceState) {
+    case 0:
+      // Animated welcome screen
+      showWelcomeScreen();
+      startupSequenceState = 1;
+      startupSequenceTimer = currentTime;
+      break;
+      
+    case 1:
+      // Wait for welcome animation
+      if (elapsed >= 2000) {
+        startupSequenceState = 2;
+        startupSequenceTimer = currentTime;
+      }
+      break;
+      
+    case 2:
+      // Loading progress bar
+      showLoadingProgress(elapsed);
+      if (elapsed >= 2500) {
+        startupSequenceState = 3;
+        startupSequenceTimer = currentTime;
+      }
+      break;
+      
+    case 3:
+      // System checks
+      showSystemChecks(elapsed);
+      if (elapsed >= 2000) {
+        startupSequenceState = 4;
+        startupSequenceTimer = currentTime;
+      }
+      break;
+      
+    case 4:
+      // Feature showcase
+      showFeatureShowcase(elapsed);
+      if (elapsed >= 2000) {
+        startupSequenceState = 5;
+        startupSequenceTimer = currentTime;
+      }
+      break;
+      
+    case 5:
+      // Ready screen
+      showReadyScreen();
+      startupSequenceState = 6;
+      startupSequenceTimer = currentTime;
+      break;
+      
+    case 6:
+      // Final wait before switching to main display
+      if (elapsed >= 1500) {
+        startupSequenceActive = false;
+        lcdManager.exitStartupMode();
+      }
+      break;
+  }
+}
+
+/**
+ * Show animated welcome screen
+ */
+void showWelcomeScreen() {
+  lcdManager.showStartupMessage("* ARDU-STIM v3.0 *");
+  
+  // Add decorative elements on other lines
+  lcdDisplay.setCursor(0, 0);
+  lcdDisplay.print("====================");
+  lcdDisplay.setCursor(0, 2);
+  lcdDisplay.print("  Engine Simulator   ");
+  lcdDisplay.setCursor(0, 3);
+  lcdDisplay.print("====================");
+}
+
+/**
+ * Show loading progress bar
+ */
+void showLoadingProgress(uint32_t elapsed) {
+  static uint8_t lastProgress = 0;
+  
+  // Calculate progress (0-18 characters to fit in brackets)
+  uint8_t progress = (elapsed * 18) / 2500;
+  if (progress > 18) progress = 18;  // Cap at 18 to prevent overflow
+  
+  // Update display only if progress changed
+  if (progress != lastProgress) {
+    lastProgress = progress;
+    
+    lcdDisplay.clear();
+    lcdDisplay.setCursor(0, 0);
+    lcdDisplay.print("   Loading System    ");
+    
+    // Progress bar on line 2
+    lcdDisplay.setCursor(0, 2);
+    lcdDisplay.print("[");
+    for (uint8_t i = 0; i < 18; i++) {
+      if (i < progress) {
+        lcdDisplay.print("=");
+      } else {
+        lcdDisplay.print(" ");
+      }
+    }
+    lcdDisplay.print("]");
+    
+    // Percentage and static "Complete" text on line 3
+    lcdDisplay.setCursor(0, 3);
+    lcdDisplay.print("     ");
+    lcdDisplay.print((progress * 100) / 18);
+    lcdDisplay.print("% Complete");
+  }
+}
+
+/**
+ * Show system checks with checkmarks
+ */
+void showSystemChecks(uint32_t elapsed) {
+  static uint8_t lastCheck = 0;
+  
+  // Show checks every 400ms
+  uint8_t currentCheck = elapsed / 400;
+  if (currentCheck > 4) currentCheck = 4;
+  
+  if (currentCheck != lastCheck) {
+    lastCheck = currentCheck;
+    
+    lcdDisplay.clear();
+    lcdDisplay.setCursor(0, 0);
+    lcdDisplay.print("  System Checks     ");
+    
+    // Check items
+    const char* checks[] = {
+      "Timer Hardware",
+      "ADC System",
+      "Pattern Memory",
+      "LCD Display",
+      "User Interface"
+    };
+    
+    for (uint8_t i = 0; i < 5 && i <= currentCheck; i++) {
+      if (i < 3) {  // Only show 3 checks to fit on screen
+        lcdDisplay.setCursor(0, i + 1);
+        lcdDisplay.print(checks[i]);
+        lcdDisplay.print(" [OK]");
+      }
+    }
+  }
+}
+
+/**
+ * Show feature showcase
+ */
+void showFeatureShowcase(uint32_t elapsed) {
+  static uint8_t lastFeature = 0;
+  
+  // Show different features every 500ms
+  uint8_t currentFeature = elapsed / 500;
+  if (currentFeature > 3) currentFeature = 3;
+  
+  if (currentFeature != lastFeature) {
+    lastFeature = currentFeature;
+    
+    lcdDisplay.clear();
+    lcdDisplay.setCursor(0, 0);
+    lcdDisplay.print("    Features        ");
+    
+    const char* features[] = {
+      "30+ Wheel Patterns",
+      "RPM: 0-9000",
+      "3 Control Modes",
+      "LCD + Serial UI"
+    };
+    
+    lcdDisplay.setCursor(0, 2);
+    lcdDisplay.print("* ");
+    lcdDisplay.print(features[currentFeature]);
+  }
+}
+
+/**
+ * Show ready screen
+ */
+void showReadyScreen() {
+  lcdDisplay.clear();
+  lcdDisplay.setCursor(0, 0);
+  lcdDisplay.print("********************");
+  lcdDisplay.setCursor(0, 1);
+  lcdDisplay.print("*  SYSTEM READY!   *");
+  lcdDisplay.setCursor(0, 2);
+  lcdDisplay.print("*   Let's Start!   *");
+  lcdDisplay.setCursor(0, 3);
+  lcdDisplay.print("********************");
+}
+#endif
+
 void loop() 
 {
   uint16_t tmp_rpm = currentStatus.base_rpm;
@@ -329,6 +537,9 @@ void loop()
   if(Serial.available() > 0) { commandParser(); }
 
 #if ENABLE_LCD_INTERFACE
+  /* Handle startup sequence first */
+  handleStartupSequence();
+  
   /* Update LCD Interface - non-blocking operations only */
   uiController.update();
   lcdManager.update();
@@ -340,23 +551,26 @@ void loop()
     {
       adc0_read_complete = false;
       
-      // Add ADC noise filtering - only update if change is significant
-      static uint16_t lastADC = 0;
-      static uint16_t filteredRPM = 0;
+      // More aggressive exponential moving average for better noise reduction
+      static uint16_t smoothedADC = 0;
+      static bool firstRead = true;
       
-      // Only update if ADC changed by more than 5 (noise filter)
-      if (abs((int)adc0 - (int)lastADC) > 5) {
-        lastADC = adc0;
-        
-        // Improved potentiometer scaling with deadband at low end
-        if (adc0 < 10) {
-          filteredRPM = 0;  // Allow 0 RPM for very low pot values
-        } else {
-          filteredRPM = ((uint32_t)adc0 * TMP_RPM_CAP) / 1023;  // Linear scaling 0-9000 RPM
-        }
+      // Initialize on first read
+      if (firstRead) {
+        smoothedADC = adc0;
+        firstRead = false;
+      } else {
+        // More aggressive exponential moving average (alpha = 0.1 for much smoother filtering)
+        // This gives 90% weight to previous value, 10% to new reading
+        smoothedADC = (smoothedADC * 9 + adc0) / 10;
       }
       
-      tmp_rpm = filteredRPM;  // Use filtered value
+      // Improved potentiometer scaling with deadband at low end
+      if (smoothedADC < 10) {
+        tmp_rpm = 0;  // Allow 0 RPM for very low pot values
+      } else {
+        tmp_rpm = ((uint32_t)smoothedADC * TMP_RPM_CAP) / 1023;  // Linear scaling 0-9000 RPM
+      }
     }
   }
   else if (config.mode == LINEAR_SWEPT_RPM)
@@ -368,12 +582,21 @@ void loop()
       if(sweep_direction == ASCENDING)
       {
         tmp_rpm = currentStatus.base_rpm + 50;  // Larger step size for visible changes
-        if(tmp_rpm >= config.sweep_high_rpm) { sweep_direction = DESCENDING; }
+        if(tmp_rpm >= 9000) { // Use maximum RPM cap instead of config value
+          sweep_direction = DESCENDING;
+          tmp_rpm = 9000; // Clamp to max value
+        }
       }
       else
       {
-        tmp_rpm = currentStatus.base_rpm - 50;  // Larger step size for visible changes
-        if(tmp_rpm <= config.sweep_low_rpm) { sweep_direction = ASCENDING; }
+        // Use signed arithmetic to prevent underflow
+        int32_t new_rpm = (int32_t)currentStatus.base_rpm - 50;
+        if(new_rpm <= 0) { // Use 0 as minimum instead of config value
+          sweep_direction = ASCENDING;
+          tmp_rpm = 0; // Clamp to minimum value
+        } else {
+          tmp_rpm = (uint16_t)new_rpm;
+        }
       }
     }
     

@@ -19,7 +19,8 @@
  */
 enum DisplayMode {
     DISPLAY_MAIN = 0,       // Main screen: wheel name, RPM, mode
-    DISPLAY_MESSAGE = 1     // Temporary message display
+    DISPLAY_MESSAGE = 1,    // Temporary message display
+    DISPLAY_STARTUP = 2     // Startup sequence display
 };
 
 /**
@@ -28,7 +29,7 @@ enum DisplayMode {
 #define MESSAGE_TIMEOUT_SHORT   1000    // 1 second for success messages
 #define MESSAGE_TIMEOUT_LONG    2000    // 2 seconds for error messages
 #define STATUS_DISPLAY_TIME     3000    // 3 seconds for status display
-#define DISPLAY_REFRESH_MIN     4000    // Minimum 4000ms between refreshes (extremely slow for readability)
+#define DISPLAY_REFRESH_MIN     1000     // Minimum 100ms between refreshes for smooth sweep mode
 
 // Removed text constants to save flash memory - using direct strings
 
@@ -44,11 +45,14 @@ private:
     uint32_t lastRefresh;
     bool needsRefresh;
     bool forceRefreshFlag;
+    bool forceStaticLabelReset;  // Force static labels to be reinitialized
     
     // Cached values for change detection
     uint8_t lastWheel;
     uint16_t lastRPM;
     uint8_t lastMode;
+    bool isDisplayInitialized;  // Track if display has been initialized
+    bool messageModeInitialized;  // Track if message mode has been initialized
     
     // Message buffer for temporary displays
     char messageBuffer[17];  // 16 chars + null terminator for LCD
@@ -120,6 +124,22 @@ public:
      */
     void showMessage(const char* message, uint16_t duration);
     
+    /**
+     * Enter startup display mode
+     * Prevents main display from interfering with startup sequence
+     */
+    void enterStartupMode();
+    
+    /**
+     * Show startup message without timeout interference
+     * @param message Message text to display
+     */
+    void showStartupMessage(const char* message);
+    
+    /**
+     * Exit startup mode and return to main display
+     */
+    void exitStartupMode();
 
     
     /**

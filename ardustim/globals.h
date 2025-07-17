@@ -45,7 +45,7 @@ struct configTable
   uint16_t fixed_rpm = 2500;
   uint16_t sweep_low_rpm = 250;
   uint16_t sweep_high_rpm = 4000;
-  uint32_t sweep_interval = 500000;  // 500ms interval (extremely slow sweep)
+  uint32_t sweep_interval = 50000;  // 50ms interval for smooth sweep
 
   //11
   bool useCompression = false;
